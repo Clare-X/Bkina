@@ -108,7 +108,7 @@ bool Cmp_SK(const StationKey &x,const StationKey &y)
 struct Iticket
 {
 	String<20> TrainId,Loc1,Loc2;
-	String<10> Kind;
+	String<20> Kind;
 	short Date,Num;
 	size_t UserId;
 };
