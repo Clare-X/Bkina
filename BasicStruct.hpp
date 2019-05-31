@@ -33,7 +33,7 @@ struct TrainValue
 	String<40> Name;
 	char Catalog;
 	String<20> Loc[60];
-	String<10> TicketKind[5];
+	String<20> TicketKind[5];
 	short KindNum,LocNum,Time1[60],Time2[60];
 	double Price[300];
 	long LeftPos;
