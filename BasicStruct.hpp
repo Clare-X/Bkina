@@ -37,6 +37,33 @@ struct TrainValue
 	short KindNum,LocNum,Time1[60],Time2[60];
 	double Price[300];
 	long LeftPos;
+		TrainValue()=default;
+	TrainValue(const TrainValue &o)
+	{
+		Catalog=o.Catalog;
+		Name=o.Name;
+		LeftPos=o.LeftPos;
+		KindNum=o.KindNum;
+		LocNum=o.LocNum;
+		size_t i;
+		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
+		for (i=0;i<300;i++) Price[i]=o.Price[i];
+	}
+	TrainValue &operator=(const TrainValue &o)
+	{
+		if (&o==this) return *this;
+		Catalog=o.Catalog;
+		Name=o.Name;
+		LeftPos=o.LeftPos;
+		KindNum=o.KindNum;
+		LocNum=o.LocNum;
+		size_t i;
+		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
+		for (i=0;i<300;i++) Price[i]=o.Price[i];
+		return *this;
+	}
 	void WriteTrain(std::ostream &os)
 	{
 		os<<Name<<Catalog<<' '<<LocNum<<' '<<KindNum<<' ';
