@@ -18,7 +18,8 @@ struct USER
 };//todo:remove ID in struct
 struct StationKey
 {
-	String<20> Loc,TrainId;
+	String<20> Loc;
+	String<20> TrainId;
 	char Catalog;
 };//stationvalue==pos(short)
 bool operator<(const StationKey &l,const StationKey &r)
@@ -33,10 +34,23 @@ struct TrainValue
 	String<40> Name;
 	char Catalog;
 	String<20> Loc[60];
-	String<10> TicketKind[5];
+	String<20> TicketKind[5];
 	short KindNum,LocNum,Time1[60],Time2[60];
 	double Price[300];
 	long LeftPos;
+	TrainValue(const TrainValue &o)
+	{
+		Catalog=o.Catalog;
+		Name=o.Name;
+		LeftPos=o.LeftPos;
+		KindNum=o.KindNum;
+		LocNum=o.LocNum;
+		size_t i;
+		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
+		for (i=0;i<300;i++) Price[i]=o.Price[i];
+	}
+
 	void WriteTrain(std::ostream &os)
 	{
 		os<<Name<<Catalog<<' '<<LocNum<<' '<<KindNum<<' ';
@@ -57,19 +71,24 @@ struct TrainValue
 	}
 	void ReadTrain(std::istream &is)
 	{
-		String<10> s1,s2,sp;
+		String<20> s1,s2,sp;
 		LeftPos=-1;
-		is>>Name>>Catalog>>LocNum>>KindNum;
+		is>>Name>>sp>>LocNum>>KindNum;Catalog=sp[0];
 		for (int i=0;i<KindNum;i++) is>>TicketKind[i];
-		is>>Loc[0]>>sp>>s1>>sp;Time2[0]=Time1[0]=s1.ToTime();
+
+		is>>Loc[0]>>sp>>s1>>sp;
+		Time2[0]=Time1[0]=s1.ToTime();
 		for (int j=0;j<KindNum;j++) is>>sp,Price[j]=sp.ToPrice();
+
 		for (int i=1;i<LocNum-1;i++)
 		{
 			is>>Loc[i]>>s1>>s2>>sp;
 			Time1[i]=s1.ToTime();Time2[i]=s2.ToTime();
 			for (int j=0;j<KindNum;j++) is>>sp,Price[i*5+j]=sp.ToPrice();
 		}
-		is>>Loc[LocNum-1]>>s2>>sp>>sp;Time2[LocNum-1]=Time1[LocNum-1]=s2.ToTime();
+
+		is>>Loc[LocNum-1]>>s2>>sp>>sp;
+		Time2[LocNum-1]=Time1[LocNum-1]=s2.ToTime();
 		for (int j=0;j<KindNum;j++) is>>sp,Price[LocNum*5+j-5]=sp.ToPrice();
 	}
 
@@ -101,14 +120,16 @@ bool Cmp_UT(const UTicketKey &x,const UTicketKey &y)
 	return false;
 	//todo: ==?
 }
-bool Cmp_SK(const StationKey &x,const StationKey &y)
+bool Cmp_SK(const StationKey &l,const StationKey &r)
 {
-	return x.Loc<y.Loc;
+    int x=l.Loc.cmp(r.Loc);
+    if (x<0) return true;
+    return false;
 }
 struct Iticket
 {
 	String<20> TrainId,Loc1,Loc2;
-	String<10> Kind;
+	String<20> Kind;
 	short Date,Num;
 	size_t UserId;
 };

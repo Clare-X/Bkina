@@ -12,7 +12,7 @@
 template <class Key,class Data,size_t Nodesize,class Cmp=std::less<Key>>
     class BPlusTree
 {
-private:
+public:
 	bptree<Key,Data,Nodesize,Cmp> Bt;
 public:
 		BPlusTree(const char* FName,const char* MMFName):Bt(FName,MMFName){}

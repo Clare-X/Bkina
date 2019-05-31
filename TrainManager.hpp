@@ -100,14 +100,18 @@ public:
 	~TrainManager() = default;
 	int AddTrain(const String<20> &Id,TrainValue &Train)
 	{
+        Train.LeftPos=-1;
 		if (AlTrain.Insert(Id,Train))return 1;
+		TrainValue t2;
+		AlTrain.Find(Id,t2);
+		if(t2.LeftPos==-2) {AlTrain.Modify(Id,Train);return 1;}
 		return 0;
 	}
 	int ModTrain(const String<20> &Id,TrainValue &Train)
 	{
 		TrainValue xTrain;
 		if (AlTrain.Find(Id,xTrain)==0)  return 0;
-		if (xTrain.LeftPos>=0) return 0;
+		if (xTrain.LeftPos!=-1) return 0;
 		Train.LeftPos=-1;
 		return AlTrain.Modify(Id,Train);
 	}
@@ -120,7 +124,8 @@ public:
 		TrainValue Train;
 		if (AlTrain.Find(Id,Train)==0)  return 0;
 		if (Train.LeftPos>=0) return 0;
-		AlTrain.Erase(Id);
+		Train.LeftPos=-2;
+        AlTrain.Modify(Id,Train);
 		return 1;
 		//todo:find in tree 2 times for the same train?
 	}
@@ -135,12 +140,14 @@ public:
 		Train.LeftPos=LSiz+1;
 		LSiz=LeftTicket.Push_Back(a,Train.LocNum*Train.KindNum);
 
-		StationKey x;x.TrainId=Id;x.Catalog=Train.Catalog;
-		for (short i=0;i<Train.LocNum;i++)
-		{
-			x.Loc=Train.Loc[i];
-			LocToId.Insert(x,i);
-		}
+        for (short i=0;i<Train.LocNum;i++)
+        {
+            StationKey x;
+            x.Loc=Train.Loc[i];
+            x.TrainId=Id;
+            x.Catalog=Train.Catalog;
+            LocToId.Insert(x,i);
+        }
 
 		AlTrain.Modify(Id,Train);
 
@@ -198,14 +205,13 @@ public:
 		for (int i=key.l1+1;i<=key.l2;++i) a[i]+=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
-		if (y==x.Num)UserTicket.Erase(key);
-		else UserTicket.Modify(key,y-x.Num);
+		UserTicket.Modify(key,y-x.Num);
 		return 1;
 	}
 	void QueryOrder(size_t UserId,short Date,const String<20> &ct,std::ostream &os)
 	{
 		bool ch[26]={0};
-		for (int i=0;ct[i]!='\0';++i) ch[ct[i]-'A']=true;
+		for (int i=0;ct[i]<='Z'&&ct[i]>='A';++i) ch[ct[i]-'A']=true;
 		UTicketKey x;x.UserId=UserId;x.Date=Date;
 		TrainValue t;
 		sjtu::vector<UTicketKey> Vkey;
@@ -213,7 +219,7 @@ public:
 		size_t cnt=0;
 		UserTicket.AskArr(x,Cmp_UT,Vkey,Vdata);
 		for (int i=0;i<Vkey.size();++i)
-			if (ch[Vkey[i].Catalog-'A']) ++cnt;
+			if (ch[Vkey[i].Catalog-'A']&&Vdata[i]>0) ++cnt;
 		if (cnt==0) {os<<"-1\n";return;}
 		os<<cnt<<'\n';
 		for (int i=0;i<Vkey.size();++i)
@@ -223,36 +229,50 @@ public:
 	void QueryTicket(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
 	{
 		bool ch[26]={0};
-		for (int i=0;ct[i]!='\0';++i) ch[ct[i]-'A']=true;
+		for (int i=0;ct[i]<='Z'&&ct[i]>='A';++i) ch[ct[i]-'A']=true;
 		StationKey k1,k2;k1.Loc=l1;k2.Loc=l2;
 		sjtu::vector<StationKey> Vkey1,Vkey2;
-		sjtu::vector<short> Vdata1,Vdata2,Vans1,Vans2;
+		sjtu::vector<short> Vdata1,Vdata2;
+        sjtu::vector<size_t> Vans1,Vans2;
 		LocToId.AskArr(k1,Cmp_SK,Vkey1,Vdata1);
 		LocToId.AskArr(k2,Cmp_SK,Vkey2,Vdata2);
 		size_t i=0,j=0;
 		TrainValue Train;
+		/*
+		os<<Vkey1.size()<<" "<<Vkey2.size()<<"L\n";
+		for (i=0;i<Vkey1.size();i++)
+        {
+		    os<<Vkey1[i].TrainId<<Vkey1[i].Loc<<"\n";
+        }
+        for (i=0;i<Vkey2.size();i++)
+        {
+            os<<Vkey2[i].TrainId<<Vkey2[i].Loc<<"\n";
+        }
+        i=0;j=0;
+        */
 		while (i<Vkey1.size()&&j<Vkey2.size())
 		{
 			if (Vkey1[i].TrainId<Vkey2[j].TrainId) {++i;continue;}
 			if (Vkey1[i].TrainId>Vkey2[j].TrainId) {++j;continue;}
 			if (Vdata1[i]>=Vdata2[j]) {++i;++j;continue;}
-			if (ch[Vkey1[i].Catalog-'A'])Vans1.push_back(i),Vans2.push_back(Vdata2[j]);
-			++i,++j;
+			if (ch[Vkey1[i].Catalog-'A']){Vans1.push_back(i);Vans2.push_back(j);++i;++j;continue;}
+
 		}
-		os<<Vans1.size()<<"\n";
-		UTicketKey k;TrainValue t;
-		for (int x=0;x<Vans1.size();++x)
+		//os<<Vans1.size()<<"\n";
+		UTicketKey k;
+		TrainValue t;
+		for (size_t x=0;x<Vans1.size();++x)
 		{
 			k.TrainId=Vkey1[Vans1[x]].TrainId;
 			k.Date=Date;
-			k.l1=Vdata1[Vans1[x]];k.l2=Vans2[x];
+			k.l1=Vdata1[Vans1[x]];k.l2=Vdata2[Vans2[x]];
 			ShowTicket_q(k,os);
 		}
 	}
     void QueryTrans(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
     {
         bool ch[26]={0};
-        for (int i=0;ct[i]!='\0';++i) ch[ct[i]-'A']=true;
+        for (int i=0;ct[i]<='Z'&&ct[i]>='A';++i) ch[ct[i]-'A']=true;
         StationKey k1,k2;k1.Loc=l1;k2.Loc=l2;
         sjtu::vector<StationKey> Vkey1,Vkey2;
         sjtu::vector<short> Vdata1,Vdata2;
