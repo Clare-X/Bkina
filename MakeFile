@@ -1,10 +1,13 @@
-CXX = g++
-CXXFLAGS = -std=c++14 -Wall -O2
-TARGET = code
-OBJ = main.cpp
+PROGRAM = code
 
-$(TARGET) : $(OBJ)
-	$(CXX) -o $(TARGET) $(OBJ) $(CXXFLAGS)
-	
-clean : 
-rm -f
+CXX = g++
+CXXFLAGS = -g -std=c++17
+
+CPP_FILES = $(wildcard *.cpp)
+H_FILES = $(wildcard *.h)
+HPP_FILES = $(wildcard *.hpp)
+
+LDOPTIONS = -L.
+
+$(PROGRAM): $(CPP_FILES) $(H_FILES) $(HPP_FILES)
+$(CXX) -o2 -o $(PROGRAM) $(CXXFLAGS) $(LDOPTIONS) $(CPP_FILES)
