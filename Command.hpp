@@ -106,7 +106,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 	}
 	if (Cmd=="buy_ticket")
 	{
-		Iticket x;String<10> y;
+		Iticket x;String<20> y;
 		is>>x.UserId>>x.Num>>x.TrainId>>x.Loc1>>x.Loc2>>y>>x.Kind;
 		x.Date=y.ToDate();
 		os<<MainTrain.BuyTicket(x)<<"\n";
@@ -114,7 +114,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 	}
 	if (Cmd=="refund_ticket")
 	{
-		Iticket x;String<10> y;
+		Iticket x;String<20> y;
 		is>>x.UserId>>x.Num>>x.TrainId>>x.Loc1>>x.Loc2>>y>>x.Kind;
 		x.Date=y.ToDate();
 		os<<MainTrain.RefundTicket(x)<<"\n";
@@ -122,7 +122,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 	}
 	if (Cmd=="query_order")
 	{
-		size_t UId;String<10> y;String<20> Cat;
+		size_t UId;String<20> y;String<20> Cat;
 		is>>UId>>y>>Cat;
 		MainTrain.QueryOrder(UId,y.ToDate(),Cat,os);
 		return;
