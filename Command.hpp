@@ -86,7 +86,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 		String<20> Id;
 		is>>Id;
 		if (MainTrain.QueryTrain(Id,Value)==0) os<<"0\n";
-		else if (Value.LeftPos<0) os<<"0\n";
+		else if (Value.Leftpos[0]<0) os<<"0\n";
 		else {os<<Id;Value.WriteTrain(os);}
 		return;
 	}

@@ -34,18 +34,18 @@ struct TrainValue
 	String<20> Loc[60];
 	String<20> TicketKind[5];
 	short KindNum,LocNum,Time1[60],Time2[60];
+	long Leftpos[31];
 	double Price[300];
-	long LeftPos;
 		TrainValue()=default;
 	TrainValue(const TrainValue &o)
 	{
 		Catalog=o.Catalog;
 		Name=o.Name;
-		LeftPos=o.LeftPos;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
 		size_t i;
 		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
 		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
 		for (i=0;i<300;i++) Price[i]=o.Price[i];
 	}
@@ -54,11 +54,11 @@ struct TrainValue
 		if (&o==this) return *this;
 		Catalog=o.Catalog;
 		Name=o.Name;
-		LeftPos=o.LeftPos;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
 		size_t i;
 		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
 		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
 		for (i=0;i<300;i++) Price[i]=o.Price[i];
 		return *this;
@@ -84,7 +84,7 @@ struct TrainValue
 	void ReadTrain(std::istream &is)
 	{
 		String<10> s1,s2,sp;
-		LeftPos=-1;
+		Leftpos[0]=-1;
 		is>>Name>>Catalog>>LocNum>>KindNum;
 		for (int i=0;i<KindNum;i++) is>>TicketKind[i];
 		is>>Loc[0]>>sp>>s1>>sp;Time2[0]=Time1[0]=s1.ToTime();
