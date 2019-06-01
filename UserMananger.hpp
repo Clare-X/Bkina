@@ -10,9 +10,9 @@ class UserManager
 {
 private:
 	FileManager<USER> File;
-	size_t Siz;
 	const int InitId=2019;
 public:
+	size_t Siz;
 	UserManager(){File.SetName("UserRecord.bin");Siz=File.size();}
 	~UserManager()=default;
 	size_t Register(USER &User)
