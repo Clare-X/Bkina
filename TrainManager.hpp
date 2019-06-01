@@ -152,7 +152,7 @@ public:
 		return 1;
 		//todo:find in tree 2 times for the same train?
 	}
-	int BuyTicket(Iticket &x)
+	int BuyTicket(Iticket &x,bool flag)
 	{
 		TrainValue Train;
 		if (AlTrain.Find(x.TrainId,Train)==0)  return 0;
