@@ -174,8 +174,12 @@ public:
 		for (int i=key.l1+1;i<=key.l2;++i) a[i]-=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
-		key.UserId=x.UserId;key.Date=x.Date;key.TrainId=x.TrainId;key.Catalog=Train.Catalog;
-		UserTicket.Insert(key,x.Num);
+		if(flag)
+		{
+			key.UserId=x.UserId;key.Date=x.Date;key.TrainId=x.TrainId;key.Catalog=Train.Catalog;
+			UserTicket.Insert(key,x.Num);
+
+		}
 		return 1;
 	}
 		int RefundTicket(Iticket &x)
