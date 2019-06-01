@@ -70,6 +70,7 @@ std::string StrDate(short t)
     }
     std::string x("2019-07-");
     x=x+char(t/10+45)+char(t%10+48)+' ';
+	return x;
 }
 
 #endif //AKINA_BASICSTRING_HPP
