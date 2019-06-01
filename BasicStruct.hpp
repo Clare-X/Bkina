@@ -11,7 +11,6 @@
 #include "vector.hpp"
 struct USER
 {
-	size_t Id=0;
 	int Priv=0;
 	String<40> Name;
 	String<20> Passwd,Email,Phone;
