@@ -109,7 +109,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 		Iticket x;String<20> y;
 		is>>x.UserId>>x.Num>>x.TrainId>>x.Loc1>>x.Loc2>>y>>x.Kind;
 		x.Date=y.ToDate();
-		os<<MainTrain.BuyTicket(x)<<"\n";
+		os<<MainTrain.BuyTicket(x,MainUser.Siz<1000)<<"\n";
 		return;
 	}
 	if (Cmd=="refund_ticket")
