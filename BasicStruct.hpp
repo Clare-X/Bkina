@@ -11,7 +11,7 @@
 #include "vector.hpp"
 struct USER
 {
-	int Priv=0;
+	char Priv=0;
 	String<40> Name;
 	String<20> Passwd,Email,Phone;
 };//todo:remove ID in struct
