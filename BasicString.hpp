@@ -37,7 +37,7 @@ public:
 	friend std::ostream &operator<<(std::ostream &os, const String &Str){os << Str.ch<<' ';return os;}
 	friend std::istream &operator>>(std::istream &is, String &Str){is>>Str.ch;return is;}
 	inline short ToTime(){return ch[0]*600+ch[1]*60+ch[3]*10+ch[4]-32208;}
-	inline short ToDate(){return ch[8]*10+ch[9]-528;}
+	inline short ToDate(){return (ch[6]-'6')*30+ch[8]*10+ch[9]-528;}
 	double ToPrice()
 	{
 		double x=0,f=1;
@@ -61,13 +61,15 @@ String<5> StrTime(const short &t)
 	x[5]='\0';
 	return x;
 }
-String<10> StrDate(const short &t)
+std::string StrDate(short t)
 {
-	String<10> x("2019-06-");
-	x[8]=t/10+48;
-	x[9]=t%10+48;
-	x[10]='\0';
-	return x;
+    if(t<=30){
+        std::string x("2019-06-");
+        x=x+char(t/10+48)+char(t%10+48)+' ';
+        return x;
+    }
+    std::string x("2019-07-");
+    x=x+char(t/10+45)+char(t%10+48)+' ';
 }
 
 #endif //AKINA_BASICSTRING_HPP

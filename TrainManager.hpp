@@ -40,27 +40,31 @@ private:
 	{
 		TrainValue t;
 		AlTrain.Find(k.TrainId,t);
-		os<<k.TrainId<<t.Loc[k.l1]<<StrDate(k.Date)<<StrTime(t.Time2[k.l1]);
-		double pri[5]={0};short lef[5]={2000,2000,2000,2000,2000};
+		double pri[5]={0};short lef[5]={0};
 		short a[t.LocNum*t.KindNum];
 		LeftTicket.AllRead(a,t.LeftPos,t.LocNum*t.KindNum);
 
-		short plus=0,mk=t.Time2[k.l1];
+		short plus=0,mk=t.Time2[0];
+        for (short i=1;i<=k.l1;++i)
+        {
+            if (t.Time1[i]<mk) ++plus;mk=t.Time1[i];
+            if (t.Time2[i]<mk) ++plus;mk=t.Time2[i];
+        }
+        os<<k.TrainId<<t.Loc[k.l1]<<StrDate(k.Date+plus)<<StrTime(t.Time2[k.l1]);
 		for (short i=k.l1+1;i<=k.l2;++i)
 		{
 			for (short j=0;j<t.KindNum;++j)
 			{
 				pri[j] += t.Price[i * 5 + j];
-				if (a[j * t.LocNum+ i] < lef[j])lef[j]=a[j * t.LocNum + i];
+				if (a[j * t.LocNum+ i] > lef[j])lef[j]=a[j * t.LocNum + i];
 			}
-
-			if (t.Time1[i]<mk) ++plus;mk=t.Time1[i];
-			if (t.Time2[i]<mk) ++plus;mk=t.Time2[i];
+            if (t.Time1[i]<mk) ++plus;mk=t.Time1[i];
+            if (t.Time2[i]<mk) ++plus;mk=t.Time2[i];
 		}
 		os<<t.Loc[k.l2]<<StrDate(k.Date+plus)<<StrTime(t.Time1[k.l2]);
 		for (short j=0;j<t.KindNum;++j)
 		{
-			os<<t.TicketKind[j]<<lef[j]<<" "<<pri[j]<<" ";
+			os<<t.TicketKind[j]<<2000-lef[j]<<" "<<pri[j]<<" ";
 		}
 		os<<'\n';
 
@@ -136,7 +140,7 @@ public:
 		if (Train.LeftPos>=0) return 0;
 	//leftpos+kindpos*locnum=this kind of ticket left.
 		short a[Train.LocNum*Train.KindNum];
-		for (int i=0;i<Train.LocNum*Train.KindNum;i++) a[i]=2000;
+		for (int i=0;i<Train.LocNum*Train.KindNum;i++) a[i]=0;
 		Train.LeftPos=LSiz+1;
 		LSiz=LeftTicket.Push_Back(a,Train.LocNum*Train.KindNum);
 
@@ -170,8 +174,8 @@ public:
 		//check:enough tickets left
 		short a[Train.LocNum];
 		LeftTicket.AllRead(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
-		for (int i=key.l1+1;i<=key.l2;++i) if (a[i]<x.Num) return 0;
-		for (int i=key.l1+1;i<=key.l2;++i) a[i]-=x.Num;
+		for (int i=key.l1+1;i<=key.l2;++i) if (a[i]+x.Num>2000) return 0;
+		for (int i=key.l1+1;i<=key.l2;++i) a[i]+=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
 		if(flag)
@@ -204,7 +208,7 @@ public:
 		//refund in LeftTicket
 		short a[Train.LocNum];
 		LeftTicket.AllRead(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
-		for (int i=key.l1+1;i<=key.l2;++i) a[i]+=x.Num;
+		for (int i=key.l1+1;i<=key.l2;++i) a[i]-=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
 		UserTicket.Modify(key,y-x.Num);
