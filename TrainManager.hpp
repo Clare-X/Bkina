@@ -100,14 +100,18 @@ public:
 	~TrainManager() = default;
 	int AddTrain(const String<20> &Id,TrainValue &Train)
 	{
+        Train.LeftPos=-1;
 		if (AlTrain.Insert(Id,Train))return 1;
+		TrainValue t2;
+		AlTrain.Find(Id,t2);
+		if(t2.LeftPos==-2) {AlTrain.Modify(Id,Train);return 1;}
 		return 0;
 	}
 	int ModTrain(const String<20> &Id,TrainValue &Train)
 	{
 		TrainValue xTrain;
 		if (AlTrain.Find(Id,xTrain)==0)  return 0;
-		if (xTrain.LeftPos>=0) return 0;
+		if (xTrain.LeftPos!=-1) return 0;
 		Train.LeftPos=-1;
 		return AlTrain.Modify(Id,Train);
 	}
@@ -120,7 +124,8 @@ public:
 		TrainValue Train;
 		if (AlTrain.Find(Id,Train)==0)  return 0;
 		if (Train.LeftPos>=0) return 0;
-		AlTrain.Erase(Id);
+		Train.LeftPos=-2;
+        AlTrain.Modify(Id,Train);
 		return 1;
 		//todo:find in tree 2 times for the same train?
 	}
@@ -173,7 +178,7 @@ public:
 		UserTicket.Insert(key,x.Num);
 		return 1;
 	}
-	int RefundTicket(Iticket &x)
+		int RefundTicket(Iticket &x)
 	{
 		TrainValue Train;
 		if (AlTrain.Find(x.TrainId,Train)==0)  return 0;
@@ -198,14 +203,13 @@ public:
 		for (int i=key.l1+1;i<=key.l2;++i) a[i]+=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
-		if (y==x.Num)UserTicket.Erase(key);
-		else UserTicket.Modify(key,y-x.Num);
+		UserTicket.Modify(key,y-x.Num);
 		return 1;
 	}
 	void QueryOrder(size_t UserId,short Date,const String<20> &ct,std::ostream &os)
 	{
 		bool ch[26]={0};
-		for (int i=0;ct[i]!='\0';++i) ch[ct[i]-'A']=true;
+		for (int i=0;ct[i]<='Z'&&ct[i]>='A';++i) ch[ct[i]-'A']=true;
 		UTicketKey x;x.UserId=UserId;x.Date=Date;
 		TrainValue t;
 		sjtu::vector<UTicketKey> Vkey;
@@ -213,14 +217,14 @@ public:
 		size_t cnt=0;
 		UserTicket.AskArr(x,Cmp_UT,Vkey,Vdata);
 		for (int i=0;i<Vkey.size();++i)
-			if (ch[Vkey[i].Catalog-'A']) ++cnt;
+			if (ch[Vkey[i].Catalog-'A']&&Vdata[i]>0) ++cnt;
 		if (cnt==0) {os<<"-1\n";return;}
 		os<<cnt<<'\n';
 		for (int i=0;i<Vkey.size();++i)
 			if (ch[Vkey[i].Catalog-'A'])
 				ShowTicket_Bought(Vkey[i],Vdata[i],os);
 	}
-	void QueryTicket(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
+void QueryTicket(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
 	{
 		bool ch[26]={0};
 		for (int i=0;ct[i]!='\0';++i) ch[ct[i]-'A']=true;
