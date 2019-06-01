@@ -15,17 +15,17 @@ private:
 public:
 	UserManager(){File.SetName("UserRecord.bin");Siz=File.size();}
 	~UserManager()=default;
-	void Register(USER &User)
+	size_t Register(USER &User)
 	{
-		User.Id=Siz+InitId;
-		User.Priv=1+(User.Id==InitId);
+		User.Priv=1+(Siz==0);
 		File.Write(&User,++Siz);
+		return Siz+InitId-1;
 	}
-	int Login(const USER &User)
+	int Login(const USER &User,size_t Id)
 	{
-		if (User.Id<=(InitId-1)||User.Id>(InitId-1)+Siz) return 0;
+		if (Id<=(InitId-1)||Id>(InitId-1)+Siz) return 0;
 		USER X;
-		File.Read(&X,User.Id-(InitId-1));
+		File.Read(&X,Id-(InitId-1));
 		return (X.Passwd==User.Passwd);
 	}
 	int Query(USER &User,size_t Id)
