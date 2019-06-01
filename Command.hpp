@@ -8,8 +8,7 @@
 #include "UserMananger.hpp"
 #include "TrainManager.hpp"
 void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainManager &MainTrain,bool &Exit)
-{
-	String<20> Cmd;
+{String<20> Cmd;
 	is>>Cmd;
 	if (Cmd=="exit")
 	{
@@ -26,18 +25,18 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 	}
 	if (Cmd=="login")
 	{
+		size_t Id;
 		USER User;
-		is>>User.Id>>User.Passwd;
-		os<<MainUser.Login(User)<<"\n";
+		is>>Id>>User.Passwd;
+		os<<MainUser.Login(User,Id)<<"\n";
 		return;
 	}
 	if (Cmd=="register")
 	{
 		USER User;
 		is>>User.Name>>User.Passwd>>User.Email>>User.Phone;
-		MainUser.Register(User);
 		//os<<User.Name<<User.Email<<User.Phone<<User.Priv<<"\n";
-		os<<User.Id<<"\n";
+		os<<MainUser.Register(User)<<"\n";
 		return;
 	}
 	if (Cmd=="query_profile")
@@ -52,8 +51,9 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 	if (Cmd=="modify_profile")
 	{
 		USER User;
-		is>>User.Id>>User.Name>>User.Passwd>>User.Email>>User.Phone;
-		os<<MainUser.Modify_Profile(User,User.Id)<<"\n";
+		size_t Id;
+		is>>Id>>User.Name>>User.Passwd>>User.Email>>User.Phone;
+		os<<MainUser.Modify_Profile(User,Id)<<"\n";
 	}
 	if (Cmd=="modify_privilege")
 	{
@@ -62,7 +62,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 		os<<MainUser.Modify_Privilege(Id1,Id2,Priv)<<"\n";
 		return;
 	}
-	if (Cmd=="add_train")
+ 	if (Cmd=="add_train")
 	{
 		TrainValue Value;
 		String<20> Id;
