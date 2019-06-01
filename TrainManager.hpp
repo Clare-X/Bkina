@@ -43,7 +43,7 @@ private:
 		double pri[5]={0};short lef[5]={0};
 		short a[t.LocNum*t.KindNum];
 		LeftTicket.AllRead(a,t.LeftPos,t.LocNum*t.KindNum);
-
+		
 		short plus=0,mk=t.Time2[0];
         for (short i=1;i<=k.l1;++i)
         {
