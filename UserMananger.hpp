@@ -42,6 +42,7 @@ public:
 	    File.SetName("UserRecord.bin");
 	    Siz=File.size();
 	    x=nullptr;
+	    AMode=false;
 	}
 	~UserManager(){ModeOff();}
 	size_t Register(USER &User)
@@ -58,7 +59,7 @@ public:
 	}
 	int Login(const USER &User,size_t Id)
 	{
-        if (Siz>cLimit&&!AMode) ModeOn();
+        if (Siz>cLimit&&!AMode&&OnKey) ModeOn();
 		if (Id<=(InitId-1)||Id>(InitId-1)+Siz) return 0;
 		if (AMode)return x[Id-InitId].Passwd==User.Passwd;
 		USER X;
