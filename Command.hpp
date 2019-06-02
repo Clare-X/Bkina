@@ -8,7 +8,8 @@
 #include "UserMananger.hpp"
 #include "TrainManager.hpp"
 void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainManager &MainTrain,bool &Exit)
-{String<20> Cmd;
+{
+    String<20> Cmd;
 	is>>Cmd;
 	if (Cmd=="exit")
 	{
@@ -65,19 +66,21 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
  	if (Cmd=="add_train")
 	{
 		TrainValue Value;
+		station* a;
 		String<20> Id;
 		is>>Id;
-		Value.ReadTrain(is);
-		os<<MainTrain.AddTrain(Id,Value)<<"\n";
+		Value.ReadTrain(is,MainTrain.Sta,a);
+		os<<MainTrain.AddTrain(Id,Value,a)<<"\n";
 		return;
 	}
 	if (Cmd=="modify_train")
 	{
 		TrainValue Value;
+		station* a;
 		String<20> Id;
 		is>>Id;
-		Value.ReadTrain(is);
-		os<<MainTrain.ModTrain(Id,Value)<<"\n";
+		Value.ReadTrain(is,MainTrain.Sta,a);
+		os<<MainTrain.ModTrain(Id,Value,a)<<"\n";
 		return;
 	}
 	if (Cmd=="query_train")
@@ -87,7 +90,7 @@ void Main_Command(std::istream &is,std::ostream &os,UserManager &MainUser,TrainM
 		is>>Id;
 		if (MainTrain.QueryTrain(Id,Value)==0) os<<"0\n";
 		else if (Value.Leftpos[0]<0) os<<"0\n";
-		else {os<<Id;Value.WriteTrain(os);}
+		else {os<<Id;Value.WriteTrain(os,MainTrain.Sta);}
 		return;
 	}
 	if (Cmd=="delete_train")

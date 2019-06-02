@@ -9,6 +9,11 @@
 #include <ostream>
 #include "BasicString.hpp"
 #include "vector.hpp"
+#include "FileManager.hpp"
+
+const bool OnKey=false;
+
+
 struct USER
 {
 	short Priv=0;
@@ -27,15 +32,19 @@ bool operator<(const StationKey &l,const StationKey &r)
 	if (x>0) return false;
 	return l.TrainId<r.TrainId;
 }
+struct station
+{
+    String<20> Loc;
+    unsigned short Time1,Time2;
+    double Price[5];
+};
 struct TrainValue
 {
 	String<40> Name;
 	char Catalog;
-	String<20> Loc[60];
 	String<20> TicketKind[5];
-	short KindNum,LocNum,Time1[60],Time2[60];
-	long Leftpos[31];
-	double Price[300];
+	short KindNum,LocNum;
+	long Leftpos[31],StPos;
 		TrainValue()=default;
 	TrainValue(const TrainValue &o)
 	{
@@ -43,12 +52,9 @@ struct TrainValue
 		Name=o.Name;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
+		StPos=o.StPos;
         for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
-        for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
         memcpy(Leftpos,o.Leftpos,248);
-        memcpy(Time1,o.Time1,120);
-        memcpy(Time2,o.Time2,120);
-        memcpy(Price,o.Price,2400);
     }
 	TrainValue &operator=(const TrainValue &o)
 	{
@@ -57,48 +63,64 @@ struct TrainValue
 		Name=o.Name;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
+        StPos=o.StPos;
         for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
-        for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
         memcpy(Leftpos,o.Leftpos,248);
-        memcpy(Time1,o.Time1,120);
-        memcpy(Time2,o.Time2,120);
-        memcpy(Price,o.Price,2400);
         return *this;
 	}
-	void WriteTrain(std::ostream &os)
+	void WriteTrain(std::ostream &os,FileManager<station,1024> &f)
 	{
 		os<<Name<<Catalog<<' '<<LocNum<<' '<<KindNum<<' ';
 		for (int i=0;i<KindNum;i++) os<<TicketKind[i];
 		os<<'\n';
-		os<<Loc[0]<<"xx:xx "<<StrTime(Time1[0])<<"xx:xx ";
-		for (int j=0;j<KindNum;j++) os<<"￥"<<Price[j]<<' ';
+		station *a=new station[LocNum];
+		f.AllRead(a,StPos,LocNum);
+		os<<a[0].Loc<<"xx:xx "<<StrTime(a[0].Time1)<<"xx:xx ";
+		for (int j=0;j<KindNum;j++) os<<"￥"<<a[0].Price[j]<<' ';
 		os<<'\n';
 		for (int i=1;i<LocNum-1;i++)
 		{
-			os<<Loc[i]<<StrTime(Time1[i])<<StrTime(Time2[i])<<StrTime(Time2[i]-Time1[i]);
-			for (int j=0;j<KindNum;j++) os<<"￥"<<Price[i*5+j]<<' ';
+			os<<a[i].Loc<<StrTime(a[i].Time1)<<StrTime(a[i].Time2)<<StrTime(a[i].Time2-a[i].Time1);
+			for (int j=0;j<KindNum;j++) os<<"￥"<<a[i].Price[j]-a[i-1].Price[j]<<' ';
 			os<<'\n';
 		}
-		os<<Loc[LocNum-1]<<StrTime(Time1[LocNum-1])<<"xx:xx xx:xx ";
-		for (int j=0;j<KindNum;j++) os<<"￥"<<Price[(LocNum-1)*5+j]<<' ';
+		os<<a[LocNum-1].Loc<<StrTime(a[LocNum-1].Time1)<<"xx:xx xx:xx ";
+		for (int j=0;j<KindNum;j++) os<<"￥"<<a[LocNum-1].Price[j]-a[LocNum-2].Price[j]<<' ';
 		os<<'\n';
+		delete[] a;
 	}
-	void ReadTrain(std::istream &is)
+	void ReadTrain(std::istream &is,FileManager<station,1024> &f,station* &a)
 	{
 		String<10> s1,s2,sp;
 		Leftpos[0]=-1;
 		is>>Name>>Catalog>>LocNum>>KindNum;
+		a=new station[LocNum];
 		for (int i=0;i<KindNum;i++) is>>TicketKind[i];
-		is>>Loc[0]>>sp>>s1>>sp;Time2[0]=Time1[0]=s1.ToTime();
-		for (int j=0;j<KindNum;j++) is>>sp,Price[j]=sp.ToPrice();
+		is>>a[0].Loc>>sp>>s1>>sp;a[0].Time2=a[0].Time1=s1.ToTime();
+		for (int j=0;j<KindNum;j++) is>>sp,a[0].Price[j]=sp.ToPrice();
 		for (int i=1;i<LocNum-1;i++)
 		{
-			is>>Loc[i]>>s1>>s2>>sp;
-			Time1[i]=s1.ToTime();Time2[i]=s2.ToTime();
-			for (int j=0;j<KindNum;j++) is>>sp,Price[i*5+j]=sp.ToPrice();
+			is>>a[i].Loc>>s1>>s2>>sp;
+            a[i].Time1=s1.ToTime();a[i].Time2=s2.ToTime();
+            while (a[i].Time1<a[i-1].Time2) a[i].Time1+=1440;
+            while (a[i].Time2<a[i].Time1) a[i].Time2+=1440;
+			for (int j=0;j<KindNum;j++)
+			{
+			    is>>sp;
+			    a[i].Price[j]=a[i-1].Price[j]+sp.ToPrice();
+			}
+
 		}
-		is>>Loc[LocNum-1]>>s2>>sp>>sp;Time2[LocNum-1]=Time1[LocNum-1]=s2.ToTime();
-		for (int j=0;j<KindNum;j++) is>>sp,Price[LocNum*5+j-5]=sp.ToPrice();
+		is>>a[LocNum-1].Loc>>s2>>sp>>sp;
+		a[LocNum-1].Time1=s2.ToTime();
+        while (a[LocNum-1].Time1<a[LocNum-2].Time2) a[LocNum-1].Time1+=1440;
+        a[LocNum-1].Time2=a[LocNum-1].Time1;
+		for (int j=0;j<KindNum;j++)
+		{
+		    is>>sp;
+		    a[LocNum-1].Price[j]=a[LocNum-2].Price[j]+sp.ToPrice();
+		}
+
 	}
 
 };//trainkey:string<20>=TrainId
