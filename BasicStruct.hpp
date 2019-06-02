@@ -1,6 +1,3 @@
-//
-// Created by 18146 on 2019/5/3.
-//
 #pragma once
 #ifndef AKINA_BASICSTRUCT_HPP
 #define AKINA_BASICSTRUCT_HPP
@@ -11,7 +8,7 @@
 #include "vector.hpp"
 #include "FileManager.hpp"
 
-const bool OnKey=false;
+const bool OnKey=true;
 
 
 struct USER
