@@ -18,8 +18,8 @@ public:
 	size_t Register(USER &User)
 	{
 		User.Priv=1+(Siz==0);
-		File.Write(&User,++Siz);
-		return Siz+InitId-1;
+		File.Push_Back(&User,1);
+		return ++Siz+InitId-1;
 	}
 	int Login(const USER &User,size_t Id)
 	{
