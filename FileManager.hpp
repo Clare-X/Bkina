@@ -70,7 +70,7 @@ public:
 		siz+=len;
 		return siz;
 		*/
-        if ((blen+siz)>=Bufsiz) Flush_Back();
+        if ((blen+len)>=Bufsiz) Flush_Back();
 	    memcpy(bf+blen,TPointer,sizeof(T)*len);
 	    blen+=len;
 	    return siz+blen;
