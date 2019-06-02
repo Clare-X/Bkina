@@ -15,7 +15,7 @@ enum NodeType{INTERNAL,LEAF};
 template <class Key,class Data,size_t Nodesize,class Cmp=std::less<Key>>
 class BPlusTree
 {
-	static const int MaxDepth = 5000;
+	static const int MaxDepth = 12000;
 //	static const int numeration = 257;
 //	static const int sizelimit = 20011;
 //	static const int hash_buffer_size = sizeof(Key);
