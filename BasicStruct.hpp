@@ -9,7 +9,7 @@
 #include "FileManager.hpp"
 
 const bool OnKey=true;
-
+const bool OnKey2=false;
 
 struct USER
 {
