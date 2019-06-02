@@ -10,7 +10,7 @@ class TrainManager
 {
 private:
 
-	BPlusTree<String<20>,TrainValue,20480> AlTrain;
+	BPlusTree<String<20>,TrainValue,4096> AlTrain;
 	BPlusTree<StationKey,short,4096> LocToId;
 	BPlusTree<UTicketKey,short,4096> UserTicket;
 	FileManager<short,2048> LeftTicket;
