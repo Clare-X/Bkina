@@ -9,7 +9,7 @@
 class UserManager
 {
 private:
-	FileManager<USER> File;
+	FileManager<USER,10240> File;
 	const int InitId=2019;
 public:
 	size_t Siz;
