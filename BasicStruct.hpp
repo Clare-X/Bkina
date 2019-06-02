@@ -43,12 +43,15 @@ struct TrainValue
 		Name=o.Name;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
-		size_t i;
-		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
-        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
-		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
-		for (i=0;i<300;i++) Price[i]=o.Price[i];
-	}
+        //for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
+        //for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
+        memcpy(TicketKind,o.TicketKind,5*sizeof(String<20>));
+        memcpy(Loc,o.Loc,LocNum*sizeof(String<20>));
+        memcpy(Leftpos,o.Leftpos,31*sizeof(long));
+        memcpy(Time1,o.Time1,60*sizeof(short));
+        memcpy(Time2,o.Time2,60*sizeof(short));
+        memcpy(Price,o.Price,300*sizeof(double));
+    }
 	TrainValue &operator=(const TrainValue &o)
 	{
 		if (&o==this) return *this;
@@ -56,12 +59,15 @@ struct TrainValue
 		Name=o.Name;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
-		size_t i;
-		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
-        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
-		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
-		for (i=0;i<300;i++) Price[i]=o.Price[i];
-		return *this;
+        //for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
+        //for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
+        memcpy(TicketKind,o.TicketKind,5*sizeof(String<20>));
+        memcpy(Loc,o.Loc,LocNum*sizeof(String<20>));
+        memcpy(Leftpos,o.Leftpos,31*sizeof(long));
+        memcpy(Time1,o.Time1,60*sizeof(short));
+        memcpy(Time2,o.Time2,60*sizeof(short));
+        memcpy(Price,o.Price,300*sizeof(double));
+        return *this;
 	}
 	void WriteTrain(std::ostream &os)
 	{
@@ -125,7 +131,6 @@ bool Cmp_UT(const UTicketKey &x,const UTicketKey &y)
 	if (x.Date<y.Date) return true;
 	if (x.Date>y.Date) return false;
 	return false;
-	//todo: ==?
 }
 bool Cmp_SK(const StationKey &x,const StationKey &y)
 {
