@@ -173,9 +173,10 @@ public:
 		{
 			if (Train.Loc[i]==x.Loc1) key.l1=i;
 			else if (Train.Loc[i]==x.Loc2) key.l2=i;
-		}//todo:probably faster but n=60 so not important.
+		}
 		if (key.l1>=key.l2) return 0;
 		//check:enough tickets left
+		std::cout<<Train.Leftpos[key.Date]<<"A\n";
 		if (Train.Leftpos[key.Date]>0)
         {
             short a[Train.LocNum];
@@ -193,13 +194,15 @@ public:
                 LSiz=LeftTicket.Push_Back(a,Train.LocNum*Train.KindNum);
                 AlTrain.Modify(x.TrainId,Train);
             }
-
+        std::cout<<"b\n";
 		//set values in UTicket
-		if(flag)
+		if(true)
 		{
-			key.UserId=x.UserId;key.Date=x.Date;key.TrainId=x.TrainId;key.Catalog=Train.Catalog;
+			key.UserId=x.UserId;
+			key.Date=x.Date;
+			key.TrainId=x.TrainId;
+			key.Catalog=Train.Catalog;
 			UserTicket.Insert(key,x.Num);
-
 		}
 		return 1;
 	}
