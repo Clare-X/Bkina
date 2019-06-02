@@ -45,10 +45,10 @@ struct TrainValue
 		LocNum=o.LocNum;
         for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
         for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
-        memcpy(Leftpos,o.Leftpos,31*sizeof(long));
-        memcpy(Time1,o.Time1,60*sizeof(short));
-        memcpy(Time2,o.Time2,60*sizeof(short));
-        memcpy(Price,o.Price,300*sizeof(double));
+        memcpy(Leftpos,o.Leftpos,248);
+        memcpy(Time1,o.Time1,120);
+        memcpy(Time2,o.Time2,120);
+        memcpy(Price,o.Price,2400);
     }
 	TrainValue &operator=(const TrainValue &o)
 	{
@@ -59,10 +59,10 @@ struct TrainValue
 		LocNum=o.LocNum;
         for (size_t i=0;i<5;++i) TicketKind[i]=o.TicketKind[i];
         for (size_t i=0;i<LocNum;++i) Loc[i]=o.Loc[i];
-        memcpy(Leftpos,o.Leftpos,31*sizeof(long));
-        memcpy(Time1,o.Time1,60*sizeof(short));
-        memcpy(Time2,o.Time2,60*sizeof(short));
-        memcpy(Price,o.Price,300*sizeof(double));
+        memcpy(Leftpos,o.Leftpos,248);
+        memcpy(Time1,o.Time1,120);
+        memcpy(Time2,o.Time2,120);
+        memcpy(Price,o.Price,2400);
         return *this;
 	}
 	void WriteTrain(std::ostream &os)
