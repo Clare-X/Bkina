@@ -154,7 +154,7 @@ public:
 		return 1;
 		//todo:find in tree 2 times for the same train?
 	}
-	int BuyTicket(Iticket &x)
+	int BuyTicket(Iticket &x,bool flag)
 	{
 		TrainValue Train;
 		if (AlTrain.Find(x.TrainId,Train)==0)  return 0;
@@ -176,11 +176,15 @@ public:
 		for (int i=key.l1+1;i<=key.l2;++i) a[i]-=x.Num;
 		LeftTicket.AlWrite(a,Train.LeftPos+key.Kind*Train.LocNum,Train.LocNum);
 		//set values in UTicket
-		key.UserId=x.UserId;key.Date=x.Date;key.TrainId=x.TrainId;key.Catalog=Train.Catalog;
-		UserTicket.Insert(key,x.Num);
+		if(flag)
+		{
+			key.UserId=x.UserId;key.Date=x.Date;key.TrainId=x.TrainId;key.Catalog=Train.Catalog;
+			UserTicket.Insert(key,x.Num);
+
+		}
 		return 1;
 	}
-	int RefundTicket(Iticket &x)
+		int RefundTicket(Iticket &x)
 	{
 		TrainValue Train;
 		if (AlTrain.Find(x.TrainId,Train)==0)  return 0;
@@ -226,7 +230,7 @@ public:
 			if (ch[Vkey[i].Catalog-'A'])
 				ShowTicket_Bought(Vkey[i],Vdata[i],os);
 	}
-	void QueryTicket(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
+void QueryTicket(const String<20> l1,const String<20> &l2,short Date,const String<20> ct,std::ostream &os)
 	{
 		bool ch[26]={0};
 		for (int i=0;ct[i]<='Z'&&ct[i]>='A';++i) ch[ct[i]-'A']=true;

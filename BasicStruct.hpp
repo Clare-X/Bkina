@@ -11,15 +11,13 @@
 #include "vector.hpp"
 struct USER
 {
-	size_t Id=0;
-	int Priv=0;
+	short Priv=0;
 	String<40> Name;
 	String<20> Passwd,Email,Phone;
 };//todo:remove ID in struct
 struct StationKey
 {
-	String<20> Loc;
-	String<20> TrainId;
+	String<20> Loc,TrainId;
 	char Catalog;
 };//stationvalue==pos(short)
 bool operator<(const StationKey &l,const StationKey &r)
@@ -36,21 +34,35 @@ struct TrainValue
 	String<20> Loc[60];
 	String<20> TicketKind[5];
 	short KindNum,LocNum,Time1[60],Time2[60];
+	long Leftpos[31];
 	double Price[300];
-	long LeftPos;
+		TrainValue()=default;
 	TrainValue(const TrainValue &o)
 	{
 		Catalog=o.Catalog;
 		Name=o.Name;
-		LeftPos=o.LeftPos;
 		KindNum=o.KindNum;
 		LocNum=o.LocNum;
 		size_t i;
 		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
 		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
 		for (i=0;i<300;i++) Price[i]=o.Price[i];
 	}
-
+	TrainValue &operator=(const TrainValue &o)
+	{
+		if (&o==this) return *this;
+		Catalog=o.Catalog;
+		Name=o.Name;
+		KindNum=o.KindNum;
+		LocNum=o.LocNum;
+		size_t i;
+		for (i=0;i<5;i++) TicketKind[i]=o.TicketKind[i];
+        for (i=0;i<31;i++) Leftpos[i]=o.Leftpos[i];
+		for (i=0;i<60;i++) Loc[i]=o.Loc[i],Time1[i]=o.Time1[i],Time2[i]=o.Time2[i];
+		for (i=0;i<300;i++) Price[i]=o.Price[i];
+		return *this;
+	}
 	void WriteTrain(std::ostream &os)
 	{
 		os<<Name<<Catalog<<' '<<LocNum<<' '<<KindNum<<' ';
@@ -71,24 +83,19 @@ struct TrainValue
 	}
 	void ReadTrain(std::istream &is)
 	{
-		String<20> s1,s2,sp;
-		LeftPos=-1;
-		is>>Name>>sp>>LocNum>>KindNum;Catalog=sp[0];
+		String<10> s1,s2,sp;
+		Leftpos[0]=-1;
+		is>>Name>>Catalog>>LocNum>>KindNum;
 		for (int i=0;i<KindNum;i++) is>>TicketKind[i];
-
-		is>>Loc[0]>>sp>>s1>>sp;
-		Time2[0]=Time1[0]=s1.ToTime();
+		is>>Loc[0]>>sp>>s1>>sp;Time2[0]=Time1[0]=s1.ToTime();
 		for (int j=0;j<KindNum;j++) is>>sp,Price[j]=sp.ToPrice();
-
 		for (int i=1;i<LocNum-1;i++)
 		{
 			is>>Loc[i]>>s1>>s2>>sp;
 			Time1[i]=s1.ToTime();Time2[i]=s2.ToTime();
 			for (int j=0;j<KindNum;j++) is>>sp,Price[i*5+j]=sp.ToPrice();
 		}
-
-		is>>Loc[LocNum-1]>>s2>>sp>>sp;
-		Time2[LocNum-1]=Time1[LocNum-1]=s2.ToTime();
+		is>>Loc[LocNum-1]>>s2>>sp>>sp;Time2[LocNum-1]=Time1[LocNum-1]=s2.ToTime();
 		for (int j=0;j<KindNum;j++) is>>sp,Price[LocNum*5+j-5]=sp.ToPrice();
 	}
 
@@ -109,7 +116,7 @@ bool operator<(const UTicketKey &t,const UTicketKey &o)
 	if (t.Catalog<o.Catalog) return true;
 	if (t.Catalog>o.Catalog) return false;
 	//
-	return (t.l1*137+t.l2*13+t.Kind<o.l1*137+o.l2*13+o.Kind);
+	return (t.l1*240+t.l2*4+t.Kind<o.l1*240+o.l2*4+o.Kind);
 }
 bool Cmp_UT(const UTicketKey &x,const UTicketKey &y)
 {
@@ -120,11 +127,9 @@ bool Cmp_UT(const UTicketKey &x,const UTicketKey &y)
 	return false;
 	//todo: ==?
 }
-bool Cmp_SK(const StationKey &l,const StationKey &r)
+bool Cmp_SK(const StationKey &x,const StationKey &y)
 {
-    int x=l.Loc.cmp(r.Loc);
-    if (x<0) return true;
-    return false;
+	return x.Loc<y.Loc;
 }
 struct Iticket
 {
